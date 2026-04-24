@@ -124,14 +124,14 @@ void drawTorus(SDL_Window* window, SDL_Renderer* renderer, SDL_Surface* sdlSurfa
         int16_t yincC = (cA >> 6);
         int16_t yincS = (sA >> 6);
 
-        int16_t xincX = (cB >> 7);
-        int16_t xincY = (sAsB >> 7);
-        int16_t xincZ = (cAsB >> 7);
+        int16_t xincX = (cB >> 6);
+        int16_t xincY = (sAsB >> 6);
+        int16_t xincZ = (cAsB >> 6);
         
-        int16_t ycA = -(cA << 1);
-        int16_t ysA = -(sA << 1);
+        int16_t ycA = -cA;
+        int16_t ysA = -sA;
 
-        for (int j = 0; j < 240; j++, ycA += yincC, ysA += yincS) {
+        for (int j = 0; j < SCREEN_HEIGHT; j +=2, ycA += yincC, ysA += yincS) {
             int xsAsB = (sAsB >> 4) - sAsB;
             int xcAsB = (cAsB >> 4) - cAsB;
 
@@ -139,7 +139,7 @@ void drawTorus(SDL_Window* window, SDL_Renderer* renderer, SDL_Surface* sdlSurfa
             int16_t vyi14 = ycA - xsAsB - sAcB;
             int16_t vzi14 = ysA + xcAsB + cAcB;
 
-            for (int i = 0; i < 240; i++, vxi14 += xincX, vyi14 -= xincY, vzi14 += xincZ) {
+            for (int i = 0; i < SCREEN_WIDTH; i +=2, vxi14 += xincX, vyi14 -= xincY, vzi14 += xincZ) {
                 int t = 512; // (256 * dz) - r2i - r1i;
 
                 int16_t px = p0x + (vxi14 >> 5); // assuming t = 512, t*vxi>>8 == vxi<<1
@@ -166,7 +166,11 @@ void drawTorus(SDL_Window* window, SDL_Renderer* renderer, SDL_Surface* sdlSurfa
                         // Draw to the SDL canvas (mapping ASCII characters to pixel brightness)
                         int color = (N > 0 ? N < 12 ? N : 11 : 0);
                         int index = j * SCREEN_WIDTH + i;
-                        pixels[index] = toBgra(color * 25, color * 20, color * 5);
+                        uint32_t bgaColor = toBgra(color * 25, color * 20, color * 5);
+                        pixels[index] = bgaColor;
+                        pixels[index+1] = bgaColor;
+                        pixels[index+SCREEN_WIDTH] = bgaColor;
+                        pixels[index+SCREEN_WIDTH+1] = bgaColor;
                         nnormals++;
                         break;
                     }
